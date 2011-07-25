@@ -10,7 +10,7 @@
             [goog.net.WebSocket.EventType :as ws-event]
             [goog.net.WebSocket.MessageEvent :as ws-message]))
 
-(def ws-url "ws://localhost:8080/socket")
+(def ws-url "ws://ws-cljs.herokuapp.com/socket")
 
 (defn create-web-socket []
   (goog.net.WebSocket.))
