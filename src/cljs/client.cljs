@@ -10,7 +10,7 @@
             [goog.net.WebSocket.EventType :as ws-event]
             [goog.net.WebSocket.MessageEvent :as ws-message]))
 
-(def ws-url "ws://ec2-46-137-58-250.eu-west-1.compute.amazonaws.com:8108/socket")
+(def ws-url (js* "'ws://' + document.location.host + '/socket'"))
 
 (defn create-web-socket []
   (goog.net.WebSocket.))
