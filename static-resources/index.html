@@ -1,13 +1,37 @@
 <html>
   <head>
     <title>WebSocket & ClojureScript</title>
+    <link rel="stylesheet" href="css/reset.css">
+    <link rel="stylesheet" href="css/text.css">
+    <link rel="stylesheet" href="css/960_12_col.css">
+    <link rel="stylesheet" href="css/main.css">
   </head>
   <body onload="client.init_app();">
-    <label for="msg">Write your message:</label>
-    <input id="msg" type="text"/>
-    <ul id="messages">
-    </ul>
+    <h1>WebSocket & ClojureScript</h1>
+    <div class="container_12">
+      <div class="prefix_1 grid_4">
+        <label for="msg">Write your message:</label>
+        <input id="msg" type="text"/>
+      </div>
+      <div class="grid_1 prefix_5">
+        <a href="http://ec2-46-137-58-250.eu-west-1.compute.amazonaws.com:8108/"
+           data-url="http://j.mp/oR4FlM"
+           data-counturl="http://ec2-46-137-58-250.eu-west-1.compute.amazonaws.com:8108/"
+           data-via="neotyk"
+           data-related="neotyk"
+           data-count="none"
+           data-text="Check out #ClojureScript talking to #Clojure over #WebSocket"
+           class="twitter-share-button">Tweet</a>
+      </div>
+      <div class="clear"></div>
+      <div class="grid_10 prefix_1 suffix_1">
+        <ul id="messages">
+          <li><h2>Messages</h2></li>
+        </ul>
+      </div>
+    </div>
     <script type="text/javascript" src="js/client.js"></script>
+    <script src="http://platform.twitter.com/widgets.js" type="text/javascript"></script>
     <script type="text/javascript">
   var _gaq = _gaq || [];
   _gaq.push(['_setAccount', 'UA-24734196-2']);
@@ -20,6 +44,34 @@
     ga.src = ('https:' == document.location.protocol ? 'https://ssl' : 'http://www') + '.google-analytics.com/ga.js';
     var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(ga, s);
   })();
-    </script>
+  twttr.events.bind('tweet', function(event) {
+    if (event) {
+      var targetUrl;
+      if (event.target && event.target.nodeName == 'IFRAME') {
+        targetUrl = extractParamFromUri(event.target.src, 'url');
+      }
+      _gaq.push(['_trackSocial', 'twitter', 'tweet', targetUrl]);
+    }
+  });
+function extractParamFromUri(uri, paramName) {
+  if (!uri) {
+    return;
+  }
+  var uri = uri.split('#')[0];  // Remove anchor.
+  var parts = uri.split('?');  // Check for query params.
+  if (parts.length == 1) {
+    return;
+  }
+  var query = decodeURI(parts[1]);
+
+  // Find url param.
+  paramName += '=';
+  var params = query.split('&');
+  for (var i = 0, param; param = params[i]; ++i) {
+    if (param.indexOf(paramName) === 0) {
+      return unescape(param.split('=')[1]);
+    }
+  }
+}
   </body>
 </html>
