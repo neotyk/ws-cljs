@@ -68,10 +68,10 @@
 
 (defn create-message-change-handler [ws]
   (fn [event]
-    (let [v (-> event
-                .target
-                .value)]
+    (let [e (.target event)
+          v (.value e)]
       (info (str "Sending '" v "'."))
+      (js* "(~{e}.value = '')")
       (.send ws v))))
 
 (defn init-controls [ws]
