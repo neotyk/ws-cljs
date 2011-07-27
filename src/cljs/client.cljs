@@ -12,8 +12,21 @@
 
 (def ws-url (js* "'ws://' + document.location.host + '/socket'"))
 
+(def initial-state {:websocket nil
+                    :nickname nil})
+
+(def state (atom initial-state))
+
+(defn get-websocket []
+  (:websocket @state))
+
+(defn emit [socket msg]
+  (.send socket msg))
+
 (defn create-web-socket []
-  (goog.net.WebSocket.))
+  (let [soc (goog.net.WebSocket.)]
+    (swap! state assoc :websocket soc)
+    soc))
 
 (defn connect-web-socket!
   "Connects WebSocket"
@@ -44,12 +57,10 @@
   (let [msgs-container (dom/getElement "messages")
         new-msg (dom/createElement "li")]
     (dom/setTextContent new-msg msg)
-    (.appendChild msgs-container new-msg)))
+    (dom/appendChild msgs-container new-msg)))
 
 (defn ws-opened-handler [event]
-  (-> event
-      .target
-      (.send "Woo hoo!!")))
+  (info (str "WebSocket opened: " event)))
 
 (defn ws-message-handler [event]
   (add-message (.message event))
@@ -71,8 +82,8 @@
     (let [e (.target event)
           v (.value e)]
       (info (str "Sending '" v "'."))
-      (js* "(~{e}.value = '')")
-      (.send ws v))))
+      (.send ws v)
+      (js* "~{e}.value = ''"))))
 
 (defn init-controls [ws]
   (let [input (dom/getElement "msg")

@@ -1,7 +1,7 @@
 (ns ws-cljs.core
   (:use [aleph.http :only [start-http-server wrap-aleph-handler wrap-ring-handler]]
         [compojure.core :only [GET defroutes]]
-        [lamina.core :only [channel map* receive siphon]]
+        [lamina.core :only [channel enqueue map* receive siphon]]
         [ring.middleware.file :only [wrap-file]]
         [ring.middleware.file-info :only [wrap-file-info]]
         [ring.util.response :only [redirect]])
@@ -13,8 +13,15 @@
   (println (format "Connected from %s." id))
   (receive ch
            (fn [name]
-             (siphon (map* #(str id ": " %) ch) broadcast-channel)
-             (siphon broadcast-channel ch))))
+             (siphon (map*
+                      (fn [msg]
+                        (println (format "Message from %s: '%s'." name msg))
+                        (str name ": " msg))
+                      ch)
+                     broadcast-channel)
+             (siphon broadcast-channel ch)
+             (enqueue ch (format "server: Hello %s! Enjoy your stay and share if you like it." name))))
+  (enqueue ch "server: What is your name?"))
 
 (defroutes my-app 
   (GET "/" [] (redirect "index.html"))
