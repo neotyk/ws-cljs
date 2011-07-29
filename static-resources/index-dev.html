@@ -1,6 +1,6 @@
-<html class="light blue">
+<html class="dark red">
   <head>
-    <title>WebSocket, Clojure & ClojureScript</title>
+    <title>WebSocket & ClojureScript DEV</title>
     <link href="/css/screen.css" media="screen, projection" rel="stylesheet" type="text/css" />
     <link href="/css/print.css" media="print" rel="stylesheet" type="text/css" />
     <!--[if lt IE 8]>
@@ -10,7 +10,7 @@
   <body class="demo">
     <div id="container">
       <div id="header">
-        <h1>WebSocket, Clojure & ClojureScript</h1>
+        <h1>WebSocket, Clojure & ClojureScript DEV</h1>
       </div>
       
       <div id="sidebar">
@@ -44,7 +44,11 @@
         </ul>
       </div> 
     </div>
-    <script type="text/javascript" src="js/client.js"></script>
+    <script type="text/javascript" src="js-dev/goog/base.js"></script>
+    <script type="text/javascript" src="js-dev/client-deps.js"></script>
+    <script type="text/javascript">
+      goog.require('client');
+    </script>
     <script src="http://platform.twitter.com/widgets.js" type="text/javascript"></script>
     <script type="text/javascript">
   var _gaq = _gaq || [];

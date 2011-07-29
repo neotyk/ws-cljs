@@ -13,6 +13,7 @@
   (println (format "Connected from %s." id))
   (receive ch
            (fn [name]
+             (println (format "%s introduced as '%s'." id name))
              (siphon (map*
                       (fn [msg]
                         (println (format "Message from %s: '%s'." name msg))

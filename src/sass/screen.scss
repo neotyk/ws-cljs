@@ -10,7 +10,8 @@
 // Combine the partials into a single screen stylesheet.
 @import "partials/page";
 @import "partials/form";
-@import "partials/two_col";
+@import "partials/layout";
+@import "partials/solarize";
 
 h1 {
   text-align: center;
@@ -18,13 +19,10 @@ h1 {
   margin-bottom: 20px;
   font-size: 25px;
   border-bottom-width: 2px;
-  border-style: dashed;
-  border-bottom-color: gray; }
+  border-style: dashed; }
 
 h2 {
   font-size: 23px; }
 
-#messages {
-  max-height: 500px;
-  min-height: 500px;
-  overflow-y: auto; }
+#log {
+  border-top: 3px solid $red;}

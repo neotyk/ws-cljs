@@ -7,6 +7,7 @@
 //      <div id="header"></div>
 //      <div id="sidebar"></div>
 //      <div id="content"></div>
+//      <div id="log"></div>
 //      <div id="footer"></div>
 //    </div>
 //
@@ -18,20 +19,22 @@
 //    |#sidebar|    #content   |
 //    |        |               |
 //    +------------------------+
+//    |        #log            |
+//    +--------+---------------+
 //    |        #footer         |
 //    +--------+---------------+
 
 @import "compass/layout.scss";
 
-body.two-col {
+body.demo {
   #container {
     @include container; }
   #header {
     @include column($blueprint-grid-columns); }
   #footer {
     @include container;
-    @include sticky-footer(54px, "#container", "#container-footer", "#footer");
     @include column($blueprint-grid-columns);
+    @include sticky-footer(250px);
   }
   #footer>ul {
     @include horizontal-list(); }
@@ -44,4 +47,12 @@ body.two-col {
     // With 24 cols, this is 16.
     $content-columns: ceil(2 * $blueprint-grid-columns / 3);
     // true means it's the last column in the row
-    @include column($content-columns, true); } }
+    @include column($content-columns, true);
+    #messages {
+      max-height: 500px;
+      min-height: 200px;
+      overflow-y: auto; } }
+  #log {
+    width: 100%;
+    height: 35%;
+    overflow: auto;}}

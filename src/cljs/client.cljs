@@ -1,6 +1,7 @@
 (ns client
   (:require [goog.debug :as debug]
             [goog.debug.FancyWindow :as fancy-window]
+            [goog.debug.DivConsole :as div-console]
             [goog.debug.Logger :as log]
             [goog.dom :as dom]
             [goog.events :as events]
@@ -12,18 +13,40 @@
 
 (def ws-url (js* "'ws://' + document.location.host + '/socket'"))
 
+
+;; State
 (def initial-state {:websocket nil
                     :nickname nil})
 
 (def state (atom initial-state))
 
+
+;; Log
+(defn info [msg]
+  (let [logger (goog.debug.Logger/getLogger "client")]
+    (.info logger msg)))
+
+(defn init-logger []
+  (let [win (goog.debug.DivConsole. (dom/getElement "log"))]
+    (.setCapturing win true)))
+
+;; Display
+(defn add-message [msg]
+  (let [msgs-container (dom/getElement "messages")
+        new-msg (dom/createElement "li")]
+    (dom/setTextContent new-msg msg)
+    (dom/appendChild msgs-container new-msg)))
+
+
+;; WebSocket
 (defn get-websocket []
   (:websocket @state))
 
 (defn emit [socket msg]
+  (info (str "emit '" msg "' on '" socket "'."))
   (.send socket msg))
 
-(defn create-web-socket []
+(defn create-web-socket! []
   (let [soc (goog.net.WebSocket.)]
     (swap! state assoc :websocket soc)
     soc))
@@ -49,22 +72,13 @@
        (when closed
          (.listen handler ws ws-event/CLOSED closed)))))
 
-(defn info [msg]
-  (let [logger (goog.debug.Logger/getLogger "client")]
-    (.info logger msg)))
-
-(defn add-message [msg]
-  (let [msgs-container (dom/getElement "messages")
-        new-msg (dom/createElement "li")]
-    (dom/setTextContent new-msg msg)
-    (dom/appendChild msgs-container new-msg)))
-
 (defn ws-opened-handler [event]
   (info (str "WebSocket opened: " event)))
 
 (defn ws-message-handler [event]
-  (add-message (.message event))
-  (info (str "Message received: " (.message event))))
+  (let [payload (.message event)]
+    (info (str "Message received: " payload))
+    (add-message payload)))
 
 (defn ws-error-handler [event]
   (info (str "WebSocket error: " event)))
@@ -72,17 +86,12 @@
 (defn ws-closed-handler [event]
   (info (str "WebSocket closed: " event)))
 
-(defn init-debuger []
-  (let [win (goog.debug.FancyWindow. "main")]
-    (.setEnabled win true)
-    (.init win)))
 
 (defn create-message-change-handler [ws]
   (fn [event]
     (let [e (.target event)
-          v (.value e)]
-      (info (str "Sending '" v "'."))
-      (.send ws v)
+          msg (.value e)]
+      (emit ws msg)
       (js* "~{e}.value = ''"))))
 
 (defn init-controls [ws]
@@ -91,10 +100,10 @@
     (info (str "Installing handler on " input))
     (events/listen input event-type/CHANGE handler)))
 
-(defn ^{:export true} init-app []
-  (init-debuger)
+(defn init []
+  (init-logger)
   (info "Initilizing application.")
-  (let [socket (create-web-socket)]
+  (let [socket (create-web-socket!)]
     (configure-web-socket socket
                           ws-opened-handler
                           ws-message-handler
@@ -103,3 +112,4 @@
     (connect-web-socket! socket)
     (init-controls socket)))
 
+(init)
