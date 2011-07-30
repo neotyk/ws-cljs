@@ -8,60 +8,53 @@
             [lamina.core :as lamina]
             [compojure.core :as compojure]))
 
-(def broadcast-channel (lamina/channel))
+(def broadcast-channel (lamina/permanent-channel))
 
 (def counter (atom 0))
 
 (defn create-close-handler
   "Create WebSocket close handler."
-  [ch]
-  (fn [] 
-    (println "Closing " ch)
+  [ip nick]
+  (fn []
+    (println ip ": Closing" @nick)
     (swap! counter dec)
-    (lamina/enqueue broadcast-channel (str "/connected " @counter))))
+    (lamina/enqueue broadcast-channel (str "/left " @nick))))
 
 (defn create-drained-handler
   "Create WebSocker backing channel drained halnder."
-  [ch]
+  [ip nick]
   (fn []
-    (println "Drained " ch)))
+    (println ip ": Drained" @nick)))
 
-(defn chat-handler [ch {id :remote-addr}]
-  (println (format "Connected from %s." id))
-  (swap! counter inc)
-  (lamina/enqueue broadcast-channel (str "/connected " @counter))
+(defn chat-handler [ch {ip :remote-addr}]
+  (let [nick (atom :no-name)]
+    (println ip ": Connected")
+    (swap! counter inc)
+    (lamina/enqueue broadcast-channel (str "/count " @counter))
 
-  ;; register close handler
-  (lamina/on-closed ch (create-close-handler ch))
+    ;; register close handler
+    (lamina/on-closed ch (create-close-handler ip nick))
 
-  ;; drained handler
-  (lamina/on-drained ch (create-drained-handler ch))
+    ;; drained handler
+    (lamina/on-drained ch (create-drained-handler ip nick))
 
-  (lamina/receive ch
-                  (fn [name]
-                    (println (format "%s introduced as '%s'." id name))
-                    (lamina/enqueue broadcast-channel (str "/joined " name))
-                    (lamina/siphon (lamina/map*
-                                    (fn [msg]
-                                      (println (format "Message from %s: '%s'." name msg))
-                                      (cond
-                                       (lamina/closed? ch)
-                                       (do
-                                         (println (format "%s disconnected." name))
-                                         (str "/gone " name))
-
-                                       (lamina/drained? ch)
-                                       (do
-                                         (println (format "%s channel drained, message: '%s'."
-                                                          name msg)))
-
-                                       :default
-                                       (str name ": " msg)))
-                                    ch)
-                                   broadcast-channel)
-                    (lamina/siphon broadcast-channel ch)
-                    (lamina/enqueue ch (format "server: Hello %s! Enjoy your stay and share if you like it." name))))
-  (lamina/enqueue ch "server: What is your name?"))
+    (lamina/receive ch
+                    (fn [name]
+                      (when name
+                        (do
+                          (println ip ": /nick" name)
+                          (reset! nick name)
+                          (lamina/enqueue broadcast-channel (str "/joined " name))
+                          (lamina/siphon (lamina/map*
+                                          (fn [msg]
+                                            (when msg
+                                              (println ip ":" name ":" msg)
+                                              (str "/msg " name " " msg)))
+                                          ch)
+                                         broadcast-channel)
+                          (lamina/siphon broadcast-channel ch)
+                          (lamina/enqueue ch (format "server: Hello %s! Enjoy your stay and share if you like it." name))))))
+    (lamina/enqueue ch "server: What is your name?")))
 
 (compojure/defroutes my-app 
   (compojure/GET "/" [] (redirect "index.html"))
