@@ -7,15 +7,14 @@
       <link href="/css/ie.css" media="screen, projection" rel="stylesheet" type="text/css" />
     <![endif]-->
   </head>
-  <body class="demo">
+  <body class="demo" onUnload="javascript: client.unload()">
     <div id="container">
       <div id="header">
         <h1>WebSocket, Clojure & ClojureScript</h1>
       </div>
       
       <div id="sidebar">
-        <label for="msg">Write your message:</label>
-        <input id="msg" type="text" class="title"/>
+        <input id="msg" type="text" class="title" label="Write your message"/>
       </div>
 
       <div id="content">
