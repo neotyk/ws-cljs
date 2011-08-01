@@ -17,20 +17,31 @@
 (def state (atom init-state))
 
 ;; Display
-(defn add-message [msg]
+(defn new-message [msg]
   (let [msgs-container (dom/getElement "messages")
         new-msg (dom/createElement "li")]
     (dom/setTextContent new-msg msg)
     (dom/appendChild msgs-container new-msg)))
 
+(defn new-joiner [nick]
+  (new-message (str nick " joined")))
+
+(defn new-leaver [nick]
+  (new-message (str nick " left")))
+
+(defn new-count [nr]
+  (new-message (str "#" nr " connected")))
+
 ;; WebSocket handlers
 (defn websocket-opened [event]
   (log/info "websocket" (str "WebSocket opened: " event)))
 
-(defn websocket-message [event]
-  (let [payload (.message event)]
-    (log/info "websocket" (str "Message received: " payload))
-    (add-message payload)))
+(defn websocket-message [cmd body]
+  (cond
+   (= cmd "msg") (new-message body)
+   (= cmd "joined") (new-joiner body)
+   (= cmd "left") (new-leaver body)
+   (= cmd "count") (new-count body)))
 
 (defn websocket-error [event]
   (log/info "websocket" (str "WebSocket error: " event)))
@@ -48,7 +59,7 @@
         (do
           (swap! state assoc :nick msg)
           (socket/emit! soc "nick" msg)))
-      (js* "~{e}.value = ''"))))
+      (set! e.value ""))))
 
 (defn init-controls [handler]
   (let [input (dom/getElement "msg")]
@@ -62,12 +73,12 @@
 
 (defn disable-controls []
   (let [input (dom/getElement "msg")]
-    (js* "~{input}.disabled = true")
-    (js* "~{input}.hidden = true")))
+    (set! input.disabled true)
+    (set! input.hidden true)))
 
 (defn install-shutdown-hook [f]
   (let [body (js* "document.body")]
-    (log/info "client" "Installing shutdown hook.")
+    (log/info "client" "Installing unload hook.")
     (set! body.onunload f)))
 
 (defn init []
@@ -84,6 +95,6 @@
       (init-controls (create-message-change socket)))
     (do
       (disable-controls)
-      (add-message "No WebSocket supported, get a decent browser."))))
+      (new-message "No WebSocket supported, get a decent browser."))))
 
 (init)

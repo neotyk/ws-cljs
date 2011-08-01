@@ -48,12 +48,17 @@
                           (reset! nickname nick)
                           (lamina/enqueue broadcast-channel (str "/joined " nick))
                           (lamina/siphon
-                           (lamina/map* (fn [msg]
-                                          (when msg
-                                            (let [[_ cmd body] (re-matches #"\/([^ ]+) (.*)" msg)]
-                                              (println ip ":" nick ":" cmd ":" body)
-                                              (condp = cmd
-                                                "msg" (str "/msg " nick " " body)))))
+                           (lamina/map*
+                            (fn [msg]
+                              (when msg
+                                (let [[_ cmd body] (re-matches #"\/([^ ]+) (.*)" msg)]
+                                  (println ip ":" nick ":" cmd ":" body)
+                                  (cond
+                                   (= cmd "msg") (str "/msg " nick " " body)
+                                   (= cmd "nick") (let [old-nick @nickname]
+                                                    (reset! nickname body)
+                                                    (str "/nick " old-nick " " body))
+                                   :default (lamina/enqueue ch (str "/error Command /" cmd " not supported"))))))
                             ch)
                            broadcast-channel)
                           (lamina/siphon broadcast-channel ch)

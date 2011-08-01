@@ -15,6 +15,10 @@
   (let [logger (goog.debug.Logger/getLogger (name category))]
     (.warning logger msg)))
 
+(defn debug [categoty msg]
+  (let [logger (goog.debug.Logger/getLogger (name categoty))]
+    (.fine logger msg)))
+
 (defn init [id]
   (let [win (goog.debug.DivConsole. (dom/getElement id))]
     (-> (log-manager/getRoot)

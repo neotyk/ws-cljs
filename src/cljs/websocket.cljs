@@ -18,7 +18,11 @@
   ([soc opened message error closed]
      (let [handler (events/EventHandler.)]
        (.listen handler soc websocket-event/OPENED opened)
-       (.listen handler soc websocket-event/MESSAGE message)
+       (.listen handler soc websocket-event/MESSAGE
+                #(let [payload (.message %)
+                       [_ cmd body] (re-matches (re-pattern "/([^ ]+) (.*)") payload)]
+                   (log/debug "websocket" (str "R: " payload))
+                   (message cmd body)))
        (when error
          (.listen handler soc websocket-event/ERROR error))
        (when closed
@@ -32,7 +36,7 @@
    (.open socket url)
    socket
    (catch js/Error e
-       (log/warn "websocket" "No WebSocket supported, get a decent browser."))))
+     (log/warn "websocket" "No WebSocket supported, get a decent browser."))))
 
 (defn close!
   "Closes WebSocket"
@@ -45,5 +49,5 @@
      (emit! socket "message" msg))
   ([socket category msg]
      (let [packet (str "/" category " " msg)]
-       (log/info "websocket" (str "Sending: " packet))
+       (log/debug "websocket" (str "T: " packet))
        (.send socket packet))))
