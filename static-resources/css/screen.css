@@ -549,7 +549,7 @@ body.demo #footer #footer {
   height: 250px;
 }
 /* line 39, ../../src/sass/partials/_layout.scss */
-body.demo #footer > ul {
+body.demo #footer ul {
   margin: 0;
   padding: 0;
   border: 0;
@@ -557,7 +557,7 @@ body.demo #footer > ul {
   *zoom: 1;
 }
 /* line 60, ../../../../../../../Library/Ruby/Gems/1.8/gems/compass-0.11.5/frameworks/compass/stylesheets/compass/typography/lists/_horizontal-list.scss */
-body.demo #footer > ul li {
+body.demo #footer ul li {
   list-style-image: none;
   list-style-type: none;
   margin-left: 0px;
@@ -568,15 +568,15 @@ body.demo #footer > ul li {
   padding-right: 4px;
 }
 /* line 48, ../../../../../../../Library/Ruby/Gems/1.8/gems/compass-0.11.5/frameworks/compass/stylesheets/compass/typography/lists/_horizontal-list.scss */
-body.demo #footer > ul li:first-child, body.demo #footer > ul li.first {
+body.demo #footer ul li:first-child, body.demo #footer ul li.first {
   padding-left: 0;
 }
 /* line 49, ../../../../../../../Library/Ruby/Gems/1.8/gems/compass-0.11.5/frameworks/compass/stylesheets/compass/typography/lists/_horizontal-list.scss */
-body.demo #footer > ul li:last-child {
+body.demo #footer ul li:last-child {
   padding-right: 0;
 }
 /* line 50, ../../../../../../../Library/Ruby/Gems/1.8/gems/compass-0.11.5/frameworks/compass/stylesheets/compass/typography/lists/_horizontal-list.scss */
-body.demo #footer > ul li.last {
+body.demo #footer ul li.last {
   padding-right: 0;
 }
 /* line 41, ../../src/sass/partials/_layout.scss */
@@ -728,4 +728,13 @@ h2 {
 /* line 31, ../../src/sass/screen.scss */
 #log {
   border-top: 3px solid #dc322f;
+}
+
+/* line 34, ../../src/sass/screen.scss */
+.goog-tooltip {
+  background: infobackground;
+  color: infotext;
+  border: 1px solid infotext;
+  padding: 1px;
+  font: menu large;
 }

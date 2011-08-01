@@ -7,42 +7,48 @@
       <link href="/css/ie.css" media="screen, projection" rel="stylesheet" type="text/css" />
     <![endif]-->
   </head>
-  <body class="demo" onUnload="javascript: client.unload()">
-    <div id="container">
-      <div id="header">
-        <h1>WebSocket, Clojure & ClojureScript DEV</h1>
-      </div>
-      
-      <div id="sidebar">
-        <input id="msg" type="text" class="title" label="Write your message"/>
-      </div>
+  <body class="demo">
+    <article id="container">
+      <header id="header">
+        <h1>WebSocket, Clojure & ClojureScript</h1>
+      </header>
 
-      <div id="content">
+      <section id="sidebar">
+        <input id="msg" type="text" class="title" label="Write your message"/>
+      </section>
+      
+      <section id="content">
         <h2>Messages</h2>
         <ul id="messages">
         </ul>
-      </div>
+      </section>
+      
+      <section>
+        <header id="log-h">Debug</header>
+        <div id="log"></div>
+      </section>
 
-      <div id="log"></div>
+      <footer id="footer">
+        <section>
+          <ul>
+            <li><a href="http://clojure.org">Clojure</a></li>
+            <li><a href="https://github.com/clojure/clojurescript">ClojureScript</a></li>
+            <li><a href="http://dev.w3.org/html5/websockets/">WebSocket</a></li>
+            <li>
+              <a href="http://ec2-46-137-58-250.eu-west-1.compute.amazonaws.com:8108/"
+                 data-url="http://j.mp/oR4FlM"
+                 data-counturl="http://ec2-46-137-58-250.eu-west-1.compute.amazonaws.com:8108/"
+                 data-via="neotyk"
+                 data-related="neotyk"
+                 data-count="none"
+                 data-text="Check out #ClojureScript talking to #Clojure over #WebSocket"
+                 class="twitter-share-button">Tweet</a>
+            </li>
+          </ul>
+        </section>
+      </footer>
+    </article>
 
-      <div id="footer">
-        <ul>
-          <li><a href="http://clojure.org">Clojure</a></li>
-          <li><a href="https://github.com/clojure/clojurescript">ClojureScript</a></li>
-          <li><a href="http://dev.w3.org/html5/websockets/">WebSocket</a></li>
-          <li>
-            <a href="http://ec2-46-137-58-250.eu-west-1.compute.amazonaws.com:8108/"
-               data-url="http://j.mp/oR4FlM"
-               data-counturl="http://ec2-46-137-58-250.eu-west-1.compute.amazonaws.com:8108/"
-               data-via="neotyk"
-               data-related="neotyk"
-               data-count="none"
-               data-text="Check out #ClojureScript talking to #Clojure over #WebSocket"
-               class="twitter-share-button">Tweet</a>
-          </li>
-        </ul>
-      </div> 
-    </div>
     <script type="text/javascript" src="js-dev/goog/base.js"></script>
     <script type="text/javascript" src="js-dev/client-deps.js"></script>
     <script type="text/javascript">

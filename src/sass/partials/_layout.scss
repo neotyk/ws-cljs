@@ -36,7 +36,7 @@ body.demo {
     @include column($blueprint-grid-columns);
     @include sticky-footer(250px);
   }
-  #footer>ul {
+  #footer ul {
     @include horizontal-list(); }
   #sidebar {
     // One third of the grid columns, rounding down. With 24 cols, this is 8.
