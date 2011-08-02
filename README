@@ -2,6 +2,27 @@
 
 WebSocket & ClojureScript repository.
 
+## Getting it up and running
+
+### Prerequisites
+
+ClojureScript with closure-library from SVN HEAD.
+You can get it from my clone of ClojureScript for now: https://github.com/neotyk/clojurescript/tree/35-cl-head
+Than you bootstrap cljs with ./script/bootstrap --closure-library-head
+You can also vote on http://dev.clojure.org/jira/browse/CLJS-35 if you would like process of getting HEAD version
+closure-library be easier.
+
+Compass if you intend to change styles.
+
+Clone the ws-cljs repo: https://github.com/neotyk/ws-cljs
+
+### Building
+
+It's quite easy: ./build.sh for production build and ./build-dev.sh for development build.
+To run it: lein run, can't get any simplier
+Production set: http://localhost:8108/index-dev.html
+Development set: http://localhost:8108/index.html
+
 ## License
 
 Copyright (C) 2011 FIXME
