@@ -7,8 +7,14 @@ WebSocket & ClojureScript repository.
 ### Prerequisites
 
 ClojureScript with closure-library from SVN HEAD.
-You can get it from my clone of ClojureScript for now: https://github.com/neotyk/clojurescript/tree/35-cl-head
-Than you bootstrap cljs with ./script/bootstrap --closure-library-head
+You can get it from my clone of ClojureScript for now: 
+
+  git clone https://github.com/neotyk/clojurescript/tree/35-cl-head -b 35-cl-head
+
+Than you bootstrap cljs with:
+
+  ./script/bootstrap --closure-library-head
+
 You can also vote on http://dev.clojure.org/jira/browse/CLJS-35 if you would like process of getting HEAD version
 closure-library be easier.
 
