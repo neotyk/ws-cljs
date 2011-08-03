@@ -32,37 +32,28 @@
   - ip - ip of client
   - ch - channel to be used
   - nickname - atom to push nickname once set
-  - msg - first message received over channel"
+  - msg - message received over channel"
   [ip ch nickname msg]
-  (when msg ;; last message in a channel is nil, so it can be the only one as well.
-    (let [[_ nick] (re-matches #"\/nick (.+)" msg)] 
-      (if nick
-        (do (println ip ": /nick" nick)
-            (reset! nickname nick)
-            (lamina/enqueue broadcast-channel (str "/joined " nick)))
-        (lamina/enqueue ch "/identify"))
-      
-      (lamina/siphon
-       (lamina/map*
-        (fn [msg]
-          (when msg
-            (if (not= :no-name @nickname)
-              (let [[_ cmd body] (re-matches #"\/([^ ]+) (.*)" msg)]
-                (println ip ":" nick ":" cmd ":" body)
-                (cond
-                 (= cmd "msg") (str "/msg " nick " " body)
-                 (= cmd "nick") (let [old-nick @nickname]
-                                  (reset! nickname body)
-                                  (str "/nick " old-nick " " body))
-                 :default (lamina/enqueue ch (str "/error Command /" cmd " not supported"))))
-              (lamina/enqueue ch "/identify"))))
-        ch)
-       broadcast-channel)
-      (lamina/siphon broadcast-channel ch)
-      (lamina/enqueue ch (format "/motd Hello %s! Enjoy your stay and share if you like it." nick)))))
+  (when msg ;; last message in a channel is nil
+    (let [[_ cmd body] (re-matches #"\/([^ ]+) (.*)" msg)]
+      (if cmd
+        (do
+          (println ip ":" @nickname ":" cmd ":" body)
+          (cond
+           (= cmd "msg") (lamina/enqueue
+                          broadcast-channel (str "/msg " @nickname " " body))
+           (= cmd "nick") (let [old-nick @nickname]
+                            (reset! nickname body)
+                            (lamina/enqueue
+                             broadcast-channel
+                             (str "/nick " (when (not= :no-name old-nick) old-nick " ") body)))
+           :default (lamina/enqueue ch (str "/error Command /" cmd " not supported"))))
+        (do
+          (println ip ":" @nickname ": no command :" msg)
+          (lamina/enqueue broadcast-channel (str "/msg " @nickname " " msg)))))))
 
 (defn chat-handler [ch {ip :remote-addr}]
-  (let [nickname (atom :no-name)]
+  (let [nickname (atom (gensym "Guest_"))]
     (println ip ": Connected")
     (swap! counter inc)
     ;; register close handler
@@ -72,8 +63,13 @@
     (lamina/on-drained ch (create-drained-handler ip nickname))
 
     ;; message handler
-    (lamina/receive ch #(receive-handler ip ch nickname %))
+    (lamina/receive-all ch #(receive-handler ip ch nickname %))
 
+    ;; publish events from broadcast-channel to clients channel
+    (lamina/siphon broadcast-channel ch)
+
+    ;; your nickname
+    (lamina/enqueue ch (str "/nick " @nickname))
     ;; say hi
     (lamina/enqueue broadcast-channel (str "/count " @counter))))
 
