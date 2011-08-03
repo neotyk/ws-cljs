@@ -1,6 +1,7 @@
 (ns client
   (:require [logger :as log]
             [websocket :as socket]
+            [clojure.string :as string]
             [goog.dom :as dom]
             [goog.ui.AnimatedZippy :as anim-zip]
             [goog.ui.LabelInput :as label-input]
@@ -17,6 +18,28 @@
 (def state (atom init-state))
 
 ;; Display
+(defn my-nick
+  "Sets new nickname used by this client"
+  [nick]
+  (swap! state assoc :nick nick)
+  (when-let [nick-el (dom/getElement "nick")]
+    (set! nick-el.textContent nick)))
+
+(defn new-nickname [body]
+  (let [parts (string/split body #" ")]
+    (if (= 2 (count parts))
+      ;; nick change
+      (let [[old new] parts]
+        (if (= old (:nick @state))
+          ;; my nick change
+          (my-nick new)
+          ;; others nick change
+          (log/info "TODO"  "Others nickname change to implement.")
+          ))
+      ;; nick set
+      (my-nick body)
+      )))
+
 (defn new-message [msg]
   (let [msgs-container (dom/getElement "messages")
         new-msg (dom/createElement "li")]
@@ -38,6 +61,7 @@
 
 (defn websocket-message [cmd body]
   (cond
+   (= cmd "nick") (new-nickname body)
    (= cmd "msg") (new-message body)
    (= cmd "joined") (new-joiner body)
    (= cmd "left") (new-leaver body)
