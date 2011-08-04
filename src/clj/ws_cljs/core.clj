@@ -46,7 +46,9 @@
                             (reset! nickname body)
                             (lamina/enqueue
                              broadcast-channel
-                             (str "/nick " (when (not= :no-name old-nick) old-nick " ") body)))
+                             (str "/nick " (when (not= :no-name old-nick)
+                                             (str old-nick " "))
+                                  body)))
            :default (lamina/enqueue ch (str "/error Command /" cmd " not supported"))))
         (do
           (println ip ":" @nickname ": no command :" msg)

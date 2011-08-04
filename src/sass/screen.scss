@@ -11,25 +11,22 @@
 @import "partials/page";
 @import "partials/form";
 @import "partials/layout";
-@import "partials/solarize";
 
 h1 {
-  text-align: center;
-  padding-top: 20px;
-  margin-bottom: 20px;
-  font-size: 25px;
-  border-bottom-width: 2px;
-  border-style: dashed; }
+  @include header-text;
+}
 
 h2 {
-  font-size: 23px; }
+  @include header-text;
+  @include quiet;
+}
 
 #msg {
   width: 100%;
-  font-size: large; }
+  @include loud; }
 
 #log {
-  border-top: 3px solid $red;}
+  border-top: 3px solid red;}
 
 .goog-tooltip {
   background: infobackground;
@@ -37,4 +34,15 @@ h2 {
   border: 1px solid infotext;
   padding: 1px;
   font: menu large;
+}
+
+.nick {
+  @include loud; }
+
+.nick:before {
+  content: "@";
+}
+
+.me:before {
+  content: "\03BB";
 }

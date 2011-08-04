@@ -20,7 +20,7 @@
        (.listen handler soc websocket-event/OPENED opened)
        (.listen handler soc websocket-event/MESSAGE
                 #(let [payload (.message %)
-                       [_ cmd body] (re-matches (re-pattern "/([^ ]+) (.*)") payload)]
+                       [_ cmd body] (re-matches #"/([^ ]+) (.*)" payload)]
                    (log/debug "websocket" (str "R: " payload))
                    (message cmd body)))
        (when error

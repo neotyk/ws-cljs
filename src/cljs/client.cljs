@@ -74,15 +74,20 @@
   (log/info "websocket" (str "WebSocket closed: " event)))
 
 ;; UI handling
+(defn extract-command
+  "Extracts command and args from message, nil if not found"
+  [msg]
+  (->> (re-matches #"^/([^ ]+) (.*)$" msg)
+       (drop 1)
+       seq))
+
 (defn create-message-change [soc]
   (fn [event]
     (let [e (.target event)
           msg (.value e)]
-      (if (:nick @state)
-        (socket/emit! soc "msg" msg)
-        (do
-          (swap! state assoc :nick msg)
-          (socket/emit! soc "nick" msg)))
+      (if-let [cmd (extract-command msg)]
+        (apply socket/emit! soc cmd)
+        (socket/emit! soc "msg" msg))
       (set! e.value ""))))
 
 (defn init-controls [handler]

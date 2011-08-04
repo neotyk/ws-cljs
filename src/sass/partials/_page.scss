@@ -6,7 +6,7 @@
 // This makes it easier to have pages without blueprint styles
 // when you're using a single/combined stylesheet.
 
-body.demo-page {
+body.demo {
   @include blueprint-typography(true);
   @include blueprint-utilities;
   @include blueprint-debug;
