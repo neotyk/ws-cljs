@@ -10,14 +10,40 @@
 
 (def broadcast-channel (lamina/permanent-channel))
 
-(def counter (atom 0))
+(def *USERS* (atom #{}))
+
+(defn state-add-user!
+  [nick]
+  (swap! *USERS* conj nick))
+
+(defn state-rm-user!
+  "Removes user from list of registered users."
+  [nick]
+  (swap! *USERS* disj nick))
+
+(defn state-mv-user!
+  "Renames user.
+TODO: Check if to user was not registered already."
+  [from to]
+  (swap! *USERS* #(-> %
+                      (disj from)
+                      (conj to))))
+
+(defn state-users-count
+  []
+  (count @*USERS*))
+
+(defn state-ls-users
+  "List users currently connected."
+  []
+  @*USERS*)
 
 (defn create-close-handler
   "Create WebSocket close handler."
   [ip nick]
   (fn []
     (println ip ": Closing" @nick)
-    (swap! counter dec)
+    (state-rm-user! @nick)
     (lamina/enqueue broadcast-channel (str "/left " @nick))))
 
 (defn create-drained-handler
@@ -43,6 +69,7 @@
            (= cmd "msg") (lamina/enqueue
                           broadcast-channel (str "/msg " @nickname " " body))
            (= cmd "nick") (let [old-nick @nickname]
+                            (state-mv-user! old-nick body)
                             (reset! nickname body)
                             (lamina/enqueue
                              broadcast-channel
@@ -54,30 +81,43 @@
           (println ip ":" @nickname ": no command :" msg)
           (lamina/enqueue broadcast-channel (str "/msg " @nickname " " msg)))))))
 
-(defn chat-handler [ch {ip :remote-addr}]
-  (let [nickname (atom (gensym "Guest_"))]
-    (println ip ": Connected")
-    (swap! counter inc)
-    ;; register close handler
-    (lamina/on-closed ch (create-close-handler ip nickname))
+(defn connected-hook
+  "Hook executed when new client connected."
+  [ch ip nickname]
+  (println ip ": Connected, assigned nick:" @nickname)
+  ;; TODO: move this out of here and handle it with list of all the
+  ;; nicknames.
+  (state-add-user! @nickname)
 
-    ;; drain handler
-    (lamina/on-drained ch (create-drained-handler ip nickname))
+  ;; register close handler
+  (lamina/on-closed ch (create-close-handler ip nickname))
 
-    ;; message handler
-    (lamina/receive-all ch #(receive-handler ip ch nickname %))
+  ;; drain handler
+  (lamina/on-drained ch (create-drained-handler ip nickname))
 
-    ;; publish events from broadcast-channel to clients channel
-    (lamina/siphon broadcast-channel ch)
+  ;; message handler
+  (lamina/receive-all ch #(receive-handler ip ch nickname %))
 
-    ;; your nickname
-    (lamina/enqueue ch (str "/nick " @nickname))
-    ;; say hi
-    (lamina/enqueue broadcast-channel (str "/count " @counter))))
+  ;; publish events from broadcast-channel to clients channel
+  (lamina/siphon broadcast-channel ch)
+
+  ;; your nickname
+  (lamina/enqueue ch (str "/nick " @nickname))
+  ;; say hi
+  (lamina/enqueue broadcast-channel (str "/count " (state-users-count))))
+
+(defn websocket-handler
+  "All WebSocket connections start here.
+Called when client connects.
+Sets up local atom for nickname (closed over by all event handlers).
+Registers event handlers for new WebSocket connection (ch)."
+  [ch {ip :remote-addr}]
+  ;; Create random nickname for yet not identified users.
+  (connected-hook ch ip (atom (gensym "Guest_"))))
 
 (compojure/defroutes my-app 
   (compojure/GET "/" [] (redirect "index.html"))
-  (compojure/GET "/socket" [] (aleph/wrap-aleph-handler chat-handler))
+  (compojure/GET "/socket" [] (aleph/wrap-aleph-handler websocket-handler))
   (route/not-found "What you're looking for is not here, sorry."))
 
 (defn -main []
