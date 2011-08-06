@@ -53,6 +53,42 @@ TODO: Check if to user was not registered already."
   (fn []
     (println ip ": Drained" @nick)))
 
+(defn onMsg
+  "On message handler.
+  Called when message has been received by server."
+  [_ nick-a body]
+  (lamina/enqueue broadcast-channel (str "/msg " @nick-a " " body)))
+
+(defn valid-nick-change?
+  "Checks if nickname change is valid."
+  [new-nick]
+  (not (or (empty? new-nick)
+           (contains? @*USERS* new-nick))))
+
+(defn onNick
+  "On nick handler.
+  Called when nick command has been recived.
+  Changes nickname (local to channel) and global user list.
+  Notifies clients of nickname change.
+  If nick to change to was taken already, rejection is sent to client
+  in form of one argument nick command with original nick.
+
+  Arguments:
+  - ch - clients channel
+  - nick-a - nickname atom used by this connection
+  - new-nick - new nickname to change to if possible"
+  [ch nick-a new-nick]
+  (let [old-nick @nick-a]
+    (if (valid-nick-change? new-nick)
+      (do ;; allowed to change
+        (println (format "nick '%s' -> '%s'"  old-nick new-nick))
+        (state-mv-user! old-nick new-nick)
+        (reset! nick-a new-nick)
+        (lamina/enqueue broadcast-channel (str "/nick " old-nick " " new-nick)))
+      (do ;; nickname already taken
+        (println (format "nick '%s' !> '%s'"  old-nick new-nick))
+        (lamina/enqueue ch (str "/nick " old-nick))))))
+
 (defn receive-handler
   "Receive message over WebWocket event handler.
   Arguments:
@@ -67,16 +103,8 @@ TODO: Check if to user was not registered already."
         (do
           (println ip ":" @nickname ":" cmd ":" body)
           (cond
-           (= cmd "msg") (lamina/enqueue
-                          broadcast-channel (str "/msg " @nickname " " body))
-           (= cmd "nick") (let [old-nick @nickname]
-                            (state-mv-user! old-nick body)
-                            (reset! nickname body)
-                            (lamina/enqueue
-                             broadcast-channel
-                             (str "/nick " (when (not= :no-name old-nick)
-                                             (str old-nick " "))
-                                  body)))
+           (= cmd "msg") (onMsg ch nickname body)
+           (= cmd "nick") (onNick ch nickname body)
            :default (lamina/enqueue ch (str "/error Command /" cmd " not supported"))))
         (do
           (println ip ":" @nickname ": no command :" msg)
@@ -86,8 +114,6 @@ TODO: Check if to user was not registered already."
   "Hook executed when new client connected."
   [ch ip nickname]
   (println ip ": Connected, assigned nick:" @nickname)
-  ;; TODO: move this out of here and handle it with list of all the
-  ;; nicknames.
   (state-add-user! @nickname)
 
   ;; register close handler
