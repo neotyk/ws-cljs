@@ -1,0 +1,16 @@
+/* the humans responsible & colophon */
+/* humanstxt.org */
+
+
+/* TEAM */
+  Author: Hubert Iwaniuk
+  Site: http://github.com/neotyk
+  Twitter: neotyk
+  Location: Europe
+
+/* THANKS */
+  Carlo Sciola
+
+/* SITE */
+  Standards: HTML5, CSS3
+  Components: ClojureScript, compass, Modernizr
