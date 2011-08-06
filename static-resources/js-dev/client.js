@@ -96,7 +96,7 @@ return logger.info.call(null,"websocket",cljs.core.str.call(null,"WebSocket clos
 * Extracts command and args from message, nil if not found
 */
 client.extract_command = (function extract_command(msg){
-return cljs.core.seq.call(null,cljs.core.drop.call(null,1,cljs.core.re_matches.call(null,/^\/([^ ]+) (.*)$/,msg)));
+return cljs.core.seq.call(null,cljs.core.drop.call(null,1,cljs.core.re_matches.call(null,/^\/([^ ]+)(?: )?(.*)$/,msg)));
 });
 client.create_message_change = (function create_message_change(soc){
 return (function (event){

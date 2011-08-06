@@ -82,25 +82,25 @@ websocket.close_BANG_ = (function close_BANG_(socket){
 return socket.close;
 });
 /**
-* Sends a message to server, optionally with category.
+* Sends a command to server, optionally with message.
 */
 websocket.emit_BANG_ = (function() {
 var emit_BANG_ = null;
-var emit_BANG___1971 = (function (socket,msg){
-return emit_BANG_.call(null,socket,"message",msg);
+var emit_BANG___1971 = (function (socket,cmd){
+return emit_BANG_.call(null,socket,cmd,null);
 });
-var emit_BANG___1972 = (function (socket,category,msg){
-var packet__1970 = cljs.core.str.call(null,"/",category," ",msg);
+var emit_BANG___1972 = (function (socket,cmd,msg){
+var packet__1970 = cljs.core.str.call(null,"/",cmd,(cljs.core.truth_(msg)?cljs.core.str.call(null," ",msg):null));
 
 logger.debug.call(null,"websocket",cljs.core.str.call(null,"T: ",packet__1970));
 return socket.send(packet__1970);
 });
-emit_BANG_ = function(socket,category,msg){
+emit_BANG_ = function(socket,cmd,msg){
 switch(arguments.length){
 case  2 :
-return emit_BANG___1971.call(this,socket,category);
+return emit_BANG___1971.call(this,socket,cmd);
 case  3 :
-return emit_BANG___1972.call(this,socket,category,msg);
+return emit_BANG___1972.call(this,socket,cmd,msg);
 }
 throw('Invalid arity: ' + arguments.length);
 };
