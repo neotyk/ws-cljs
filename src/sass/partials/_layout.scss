@@ -25,23 +25,28 @@
 //    +--------+---------------+
 
 @import "compass/layout.scss";
+@import "compass/typography/lists/bullets";
 
 body.demo {
   #container {
-    @include container; }
+    @include container;
+    min-height: 300px;
+    height: 80%; }
   #header {
     @include column($blueprint-grid-columns); }
   #footer {
-    @include container;
     @include column($blueprint-grid-columns);
-    @include sticky-footer(250px);
-  }
+    @include container; 
+    display: block;
+    float: center; }
   #footer ul {
-    @include horizontal-list(); }
+    @include horizontal-list; }
   #sidebar {
     // One third of the grid columns, rounding down. With 24 cols, this is 8.
     $sidebar-columns: floor($blueprint-grid-columns / 3);
-    @include column($sidebar-columns); }
+    @include column($sidebar-columns);
+    #participants {
+      @include no-bullets; } }
   #content {
     // Two thirds of the grid columns, rounding up.
     // With 24 cols, this is 16.
@@ -51,7 +56,8 @@ body.demo {
     #messages {
       max-height: 500px;
       min-height: 200px;
-      overflow-y: auto; } }
+      overflow-y: auto;
+      @include no-bullets; } }
   #log {
     width: 100%;
     height: 35%;

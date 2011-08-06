@@ -37,12 +37,20 @@ h2 {
 }
 
 .nick {
-  @include loud; }
+  color: $notice-color;
+  font-style: italic;
+  font-weight: bold;
+}
 
 .nick:before {
   content: "@";
+  vertical-align: super;
+  font-size: 60%;
 }
 
 .me:before {
   content: "\03BB";
+  vertical-align: super;
+  font-size: 60%;
+  color: $notice-color;
 }
