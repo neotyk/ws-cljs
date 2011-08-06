@@ -1,21 +1,37 @@
-<html class="dark red">
+<!doctype html>
+<!--[if lt IE 7 ]> <html lang="en" class="no-js ie6"> <![endif]-->
+<!--[if IE 7 ]>    <html lang="en" class="no-js ie7"> <![endif]-->
+<!--[if IE 8 ]>    <html lang="en" class="no-js ie8"> <![endif]-->
+<!--[if IE 9 ]>    <html lang="en" class="no-js ie9"> <![endif]-->
+<!--[if (gt IE 9)|!(IE)]><!-->
+<html lang="en" class="no-js">
+<!--<![endif]-->
   <head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
     <title>WebSocket & ClojureScript DEV</title>
+    <meta name="description" content="Sample application to
+                                      demonstrate how Clojure can talk
+                                      to ClojuerScript via WebSocket.">
+    <meta name="author" content="Hubert Iwaniuk">
     <link href="/css/screen.css" media="screen, projection" rel="stylesheet" type="text/css" />
     <link href="/css/print.css" media="print" rel="stylesheet" type="text/css" />
     <!--[if lt IE 8]>
-      <link href="/css/ie.css" media="screen, projection" rel="stylesheet" type="text/css" />
+    <link href="/css/ie.css" media="screen, projection" rel="stylesheet" type="text/css" />
     <![endif]-->
   </head>
   <body class="demo">
     <article id="container">
       <header id="header">
-        <h1>WebSocket, Clojure & ClojureScript</h1>
+        <h1>WebSocket, Clojure & ClojureScript DEV</h1>
       </header>
 
       <section id="sidebar">
+        <header><label for="msg">Write your message</label></header>
         <input id="msg" type="text" class="title" label="Write your message"/>
-        <div id="nick" class="nick me">no nick name</div>
+        <div>Your nickname: <span id="nick" class="nick me">no nick name</span></div>
+        <header>List of participants</header>
+        <ul id="participants"></ul>
       </section>
       
       <section id="content">
