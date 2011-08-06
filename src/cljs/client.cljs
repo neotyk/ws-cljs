@@ -77,7 +77,7 @@
 (defn extract-command
   "Extracts command and args from message, nil if not found"
   [msg]
-  (->> (re-matches #"^/([^ ]+) (.*)$" msg)
+  (->> (re-matches #"^/([^ ]+)(?: )?(.*)$" msg)
        (drop 1)
        seq))
 

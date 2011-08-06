@@ -44,10 +44,10 @@
   (.close socket))
 
 (defn emit!
-  "Sends a message to server, optionally with category."
-  ([socket msg]
-     (emit! socket "message" msg))
-  ([socket category msg]
-     (let [packet (str "/" category " " msg)]
+  "Sends a command to server, optionally with message."
+  ([socket cmd]
+     (emit! socket cmd nil))
+  ([socket cmd msg]
+     (let [packet (str "/" cmd (when msg (str " " msg)))]
        (log/debug "websocket" (str "T: " packet))
        (.send socket packet))))
