@@ -6,7 +6,8 @@
   (:require [compojure.route :as route]
             [aleph.http :as aleph]
             [lamina.core :as lamina]
-            [compojure.core :as compojure]))
+            [compojure.core :as compojure]
+            [swank.swank :as swank]))
 
 (def broadcast-channel (lamina/permanent-channel))
 
@@ -124,9 +125,10 @@ Registers event handlers for new WebSocket connection (ch)."
   (let [port (or (when-let [p (System/getenv "PORT")]
                    (Integer/parseInt p))
                  8108)]
-    (aleph/start-http-server (-> my-app
-                           (wrap-file "static-resources")
-                           wrap-file-info
-                           aleph/wrap-ring-handler) {:port port :websocket true})
+    (aleph/start-http-server (-> #'my-app
+                                 (wrap-file "static-resources")
+                                 wrap-file-info
+                                 aleph/wrap-ring-handler) {:port port :websocket true})
+    (swank/start-repl 4005)
     (println "Server started on port" port)))
         
