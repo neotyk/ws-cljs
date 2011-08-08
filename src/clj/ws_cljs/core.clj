@@ -89,6 +89,11 @@ TODO: Check if to user was not registered already."
         (println (format "nick '%s' !> '%s'"  old-nick new-nick))
         (lamina/enqueue ch (str "/nick " old-nick))))))
 
+(defn sendList
+  "Lists all connected users"
+  [ch]
+  (lamina/enqueue ch (str "/users " (state-ls-users))))
+
 (defn receive-handler
   "Receive message over WebWocket event handler.
   Arguments:
@@ -105,6 +110,7 @@ TODO: Check if to user was not registered already."
           (cond
            (= cmd "msg") (onMsg ch nickname body)
            (= cmd "nick") (onNick ch nickname body)
+           (= cmd "list") (sendList ch)
            :default (lamina/enqueue ch (str "/error Command /" cmd " not supported"))))
         (do
           (println ip ":" @nickname ": no command :" msg)
@@ -131,7 +137,7 @@ TODO: Check if to user was not registered already."
   ;; your nickname
   (lamina/enqueue ch (str "/nick " @nickname))
   ;; say hi
-  (lamina/enqueue broadcast-channel (str "/count " (state-users-count))))
+  (sendList ch))
 
 (defn websocket-handler
   "All WebSocket connections start here.
