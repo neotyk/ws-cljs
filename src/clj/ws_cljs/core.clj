@@ -121,7 +121,8 @@ TODO: Check if to user was not registered already."
   [ch ip nickname]
   (println ip ": Connected, assigned nick:" @nickname)
   (state-add-user! @nickname)
-
+  (lamina/enqueue broadcast-channel (str "/joined " @nickname))
+  
   ;; register close handler
   (lamina/on-closed ch (create-close-handler ip nickname))
 
