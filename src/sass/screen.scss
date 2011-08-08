@@ -54,3 +54,5 @@ h2 {
   font-size: 60%;
   color: $notice-color;
 }
+
+.me:hover::before {color: red;}

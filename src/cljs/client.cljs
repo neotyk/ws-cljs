@@ -1,8 +1,11 @@
 (ns client
-  (:require [logger :as log]
+  (:require [state :as state]
+            [logger :as log]
             [websocket :as socket]
+            [cljs.reader :as reader]
             [clojure.string :as string]
             [goog.dom :as dom]
+            [goog.dom.classes :as class]
             [goog.ui.AnimatedZippy :as anim-zip]
             [goog.ui.LabelInput :as label-input]
             [goog.ui.Tooltip :as tooltip]
@@ -10,36 +13,37 @@
             [goog.events.EventType :as event-type]
             [goog.events.EventHandler :as event-handler]))
 
-;; State
-(def init-state {:nick nil
-                 :count 0
-                 :connected #{}})
-
-(def state (atom init-state))
-
-;; Display
-(defn my-nick
-  "Sets new nickname used by this client"
-  [nick]
-  (swap! state assoc :nick nick)
-  (when-let [nick-el (dom/getElement "nick")]
-    (set! nick-el.textContent nick)))
+(defn refresh-users
+  "Redispalys users list."
+  ([]
+     (refresh-users (state/get-users) (state/nick)))
+  ([users me]
+     (let [participants-el (dom/getElement "participants")]
+       (dom/removeChildren participants-el)
+       (doseq [user (sort users)]
+         (let [user-el (dom/createDom "li")]
+           (class/set user-el "nick")
+           (when (= user me)
+             (class/add user-el "me"))
+           (dom/setTextContent user-el (name user))
+           (dom/appendChild participants-el user-el))))))
 
 (defn new-nickname [body]
   (let [parts (string/split body #" ")]
     (if (= 2 (count parts))
       ;; nick change
       (let [[old new] parts]
-        (if (= old (:nick @state))
+        (if (= old (state/nick))
           ;; my nick change
-          (my-nick new)
+          (state/chnick! new)
           ;; others nick change
-          (log/info "TODO"  "Others nickname change to implement.")
-          ))
+          (state/mv-user! old new))
+        (refresh-users))
       ;; nick set
-      (my-nick body)
+      (state/chnick! body)
       )))
 
+;; Display
 (defn new-message [msg]
   (let [msgs-container (dom/getElement "messages")
         new-msg (dom/createElement "li")]
@@ -47,13 +51,24 @@
     (dom/appendChild msgs-container new-msg)))
 
 (defn new-joiner [nick]
-  (new-message (str nick " joined")))
+  (state/add-user! nick)
+  (new-message (str nick " joined"))
+  (refresh-users))
 
 (defn new-leaver [nick]
-  (new-message (str nick " left")))
+  (state/rm-user! nick)
+  (new-message (str nick " left"))
+  (refresh-users))
 
 (defn new-count [nr]
   (new-message (str "#" nr " connected")))
+
+(defn users-list
+  "Updates participants list."
+  [users-str]
+  (when-let [users (into #{} (map name (reader/read-string users-str)))]
+    (state/set-users! users)
+    (refresh-users users (state/nick))))
 
 ;; WebSocket handlers
 (defn websocket-opened [event]
@@ -65,7 +80,9 @@
    (= cmd "msg") (new-message body)
    (= cmd "joined") (new-joiner body)
    (= cmd "left") (new-leaver body)
-   (= cmd "count") (new-count body)))
+   (= cmd "count") (new-count body)
+   (= cmd "users") (users-list body))
+  (log/debug "websocket" (str cmd ":" body ": DONE")))
 
 (defn websocket-error [event]
   (log/info "websocket" (str "WebSocket error: " event)))
