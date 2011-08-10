@@ -1,6 +1,7 @@
 (ns client
   (:require [commands :as cmd]
             [state :as state]
+            [localstorage :as storage]
             [logger :as log]
             [websocket :as socket]
             [goog.dom :as dom]
@@ -12,8 +13,11 @@
             [goog.events.EventHandler :as event-handler]))
 
 ;; WebSocket handlers
-(defn websocket-opened [event]
-  (log/info "websocket" (str "WebSocket opened: " event)))
+(defn websocket-opened [soc]
+  (fn [event]
+    (log/info "websocket" (str "WebSocket opened: " event))
+    (when-let [saved-nick (storage/get! "nick")]
+      (socket/emit! soc "nick" saved-nick))))
 
 (defn websocket-message [cmd body]
   (cond
@@ -70,17 +74,18 @@
 (defn init []
   (log/init "log")
   (log/info "client" "Initilizing application.")
-  (if-let [socket (-> (socket/create)
-                      (socket/configure websocket-opened
-                                        websocket-message
-                                        websocket-error
-                                        websocket-closed)
-                      (socket/connect! (js* "'ws://' + document.location.host + '/socket'")))]
-    (do
-      (install-shutdown-hook #((socket/close! socket)))
-      (init-controls (create-message-change socket)))
-    (do
-      (disable-controls)
-      (cmd/new-message "No WebSocket supported, get a decent browser."))))
+  (let [socket (socket/create)]
+    (if-let [socket (-> socket
+                        (socket/configure (websocket-opened socket)
+                                          websocket-message
+                                          websocket-error
+                                          websocket-closed)
+                        (socket/connect! (js* "'ws://' + document.location.host + '/socket'")))]
+      (do
+        (install-shutdown-hook #((socket/close! socket)))
+        (init-controls (create-message-change socket)))
+      (do
+        (disable-controls)
+        (cmd/new-message "No WebSocket supported, get a decent browser.")))))
 
 (init)

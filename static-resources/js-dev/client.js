@@ -4,6 +4,7 @@ goog.require('websocket');
 goog.require('goog.events');
 goog.require('goog.events.EventHandler');
 goog.require('goog.dom');
+goog.require('localstorage');
 goog.require('state');
 goog.require('logger');
 goog.require('goog.events.EventType');
@@ -11,8 +12,19 @@ goog.require('goog.ui.LabelInput');
 goog.require('goog.ui.AnimatedZippy');
 goog.require('goog.ui.Tooltip');
 goog.require('commands');
-client.websocket_opened = (function websocket_opened(event){
-return logger.info.call(null,"websocket",cljs.core.str.call(null,"WebSocket opened: ",event));
+client.websocket_opened = (function websocket_opened(soc){
+return (function (event){
+logger.info.call(null,"websocket",cljs.core.str.call(null,"WebSocket opened: ",event));
+var temp__3726__auto____1941 = localstorage.get_BANG_.call(null,"nick");
+
+if(cljs.core.truth_(temp__3726__auto____1941))
+{var saved_nick__1942 = temp__3726__auto____1941;
+
+return websocket.emit_BANG_.call(null,soc,"nick",saved_nick__1942);
+} else
+{return null;
+}
+});
 });
 client.websocket_message = (function websocket_message(cmd,body){
 if(cljs.core.truth_(cljs.core._EQ_.call(null,cmd,"nick")))
@@ -55,55 +67,57 @@ return cljs.core.seq.call(null,cljs.core.drop.call(null,1,cljs.core.re_matches.c
 });
 client.create_message_change = (function create_message_change(soc){
 return (function (event){
-var e__1934 = event.target;
-var msg__1935 = e__1934.value;
+var e__1943 = event.target;
+var msg__1944 = e__1943.value;
 
-var temp__3723__auto____1936 = client.extract_command.call(null,msg__1935);
+var temp__3723__auto____1945 = client.extract_command.call(null,msg__1944);
 
-if(cljs.core.truth_(temp__3723__auto____1936))
-{var cmd__1937 = temp__3723__auto____1936;
+if(cljs.core.truth_(temp__3723__auto____1945))
+{var cmd__1946 = temp__3723__auto____1945;
 
-cljs.core.apply.call(null,websocket.emit_BANG_,soc,cmd__1937);
+cljs.core.apply.call(null,websocket.emit_BANG_,soc,cmd__1946);
 } else
-{websocket.emit_BANG_.call(null,soc,"msg",msg__1935);
+{websocket.emit_BANG_.call(null,soc,"msg",msg__1944);
 }
-return e__1934.value = "";
+return e__1943.value = "";
 });
 });
 client.init_controls = (function init_controls(handler){
-var input__1938 = goog.dom.getElement.call(null,"msg");
+var input__1947 = goog.dom.getElement.call(null,"msg");
 
-(new goog.ui.LabelInput()).decorate(input__1938);
-(new goog.ui.Tooltip(input__1938,input__1938.getAttribute("label")));
-logger.info.call(null,"client",cljs.core.str.call(null,"Installing handler on ",input__1938));
-goog.events.listen.call(null,input__1938,goog.events.EventType.CHANGE,handler);
-input__1938.focus(true);
+(new goog.ui.LabelInput()).decorate(input__1947);
+(new goog.ui.Tooltip(input__1947,input__1947.getAttribute("label")));
+logger.info.call(null,"client",cljs.core.str.call(null,"Installing handler on ",input__1947));
+goog.events.listen.call(null,input__1947,goog.events.EventType.CHANGE,handler);
+input__1947.focus(true);
 return (new goog.ui.AnimatedZippy("log-h","log",false));
 });
 client.disable_controls = (function disable_controls(){
-var input__1939 = goog.dom.getElement.call(null,"msg");
+var input__1948 = goog.dom.getElement.call(null,"msg");
 
-input__1939.disabled = true;
-return input__1939.hidden = true;
+input__1948.disabled = true;
+return input__1948.hidden = true;
 });
 client.install_shutdown_hook = (function install_shutdown_hook(f){
-var body__1940 = document.body;
+var body__1949 = document.body;
 
 logger.info.call(null,"client","Installing unload hook.");
-return body__1940.onunload = f;
+return body__1949.onunload = f;
 });
 client.init = (function init(){
 logger.init.call(null,"log");
 logger.info.call(null,"client","Initilizing application.");
-var temp__3723__auto____1941 = websocket.connect_BANG_.call(null,websocket.configure.call(null,websocket.create.call(null),client.websocket_opened,client.websocket_message,client.websocket_error,client.websocket_closed),'ws://' + document.location.host + '/socket');
+var socket__1950 = websocket.create.call(null);
 
-if(cljs.core.truth_(temp__3723__auto____1941))
-{var socket__1942 = temp__3723__auto____1941;
+var temp__3723__auto____1951 = websocket.connect_BANG_.call(null,websocket.configure.call(null,socket__1950,client.websocket_opened.call(null,socket__1950),client.websocket_message,client.websocket_error,client.websocket_closed),'ws://' + document.location.host + '/socket');
+
+if(cljs.core.truth_(temp__3723__auto____1951))
+{var socket__1952 = temp__3723__auto____1951;
 
 client.install_shutdown_hook.call(null,(function (){
-return websocket.close_BANG_.call(null,socket__1942).call(null);
+return websocket.close_BANG_.call(null,socket__1952).call(null);
 }));
-return client.init_controls.call(null,client.create_message_change.call(null,socket__1942));
+return client.init_controls.call(null,client.create_message_change.call(null,socket__1952));
 } else
 {client.disable_controls.call(null);
 return commands.new_message.call(null,"No WebSocket supported, get a decent browser.");
