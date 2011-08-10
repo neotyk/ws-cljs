@@ -24,6 +24,7 @@
 //    |        #footer         |
 //    +--------+---------------+
 
+@import "compass/css3";
 @import "compass/layout.scss";
 @import "compass/typography/lists/bullets";
 
@@ -31,9 +32,18 @@ body.demo {
   #container {
     @include container;
     min-height: 300px;
-    height: 80%; }
+    height: 80%;
+    padding: 2px 1em;
+    background-color: white;
+    @include box-shadow(green 1px 1px 2px 2px inset);
+    @include border-radius(4px);
+ }
   #header {
-    @include column($blueprint-grid-columns); }
+    @include column($blueprint-grid-columns);
+    @include text-shadow;
+    @include header-text;
+    text-align: center;
+ }
   #footer {
     @include column($blueprint-grid-columns);
     @include container; 

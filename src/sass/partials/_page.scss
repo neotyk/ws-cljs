@@ -13,4 +13,8 @@ body.demo {
   @include blueprint-interaction;
   // Remove the scaffolding when you're ready to start doing visual design.
   // Or leave it in if you're happy with how blueprint looks out-of-the-box
-  @include blueprint-scaffolding; }
+  @include blueprint-scaffolding;
+  background-color: #E3E3E3;
+  border-top: 4px solid #B3CCFE;
+  color: #272727;
+}

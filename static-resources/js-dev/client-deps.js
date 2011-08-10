@@ -6,5 +6,5 @@ goog.addDependency("../websocket.js", ['websocket'], ['cljs.core', 'logger', 'go
 goog.addDependency("../autocomplete.js", ['autocomplete'], ['cljs.core', 'goog.dom', 'goog.ui.AutoComplete', 'goog.ui.AutoComplete.Basic']);
 goog.addDependency("../localstorage.js", ['localstorage'], ['cljs.core', 'goog.storage.Storage', 'goog.storage.mechanism.HTML5LocalStorage']);
 goog.addDependency("../state.js", ['state'], ['cljs.core', 'autocomplete', 'localstorage', 'logger', 'goog.dom']);
-goog.addDependency("../commands.js", ['commands'], ['cljs.core', 'state', 'cljs.reader', 'clojure.string', 'goog.dom', 'goog.dom.classes']);
+goog.addDependency("../commands.js", ['commands'], ['cljs.core', 'state', 'cljs.reader', 'clojure.string', 'goog.dom', 'goog.dom.classes', 'goog.i18n.DateTimeFormat', 'goog.date.DateTime']);
 goog.addDependency("../client.js", ['client'], ['cljs.core', 'websocket', 'goog.events', 'goog.events.EventHandler', 'goog.dom', 'localstorage', 'state', 'logger', 'goog.events.EventType', 'goog.ui.LabelInput', 'goog.ui.AnimatedZippy', 'goog.ui.Tooltip', 'commands']);

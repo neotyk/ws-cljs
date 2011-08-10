@@ -9,7 +9,7 @@
   <head>
     <meta charset="UTF-8">
     <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
-    <title>WebSocket, Clojure & ClojureScript</title>
+    <title>Silly Chat</title>
     <meta name="description" content="Sample application to
                                       demonstrate how Clojure can talk
                                       to ClojuerScript via WebSocket.">
@@ -23,21 +23,32 @@
   <body class="demo">
     <article id="container">
       <header id="header">
-        <h1>WebSocket, Clojure & ClojureScript</h1>
+        <h1>Silly Chat</h1>
       </header>
 
       <section id="sidebar">
-        <header><label for="msg">Write your message</label></header>
-        <input id="msg" type="text" class="title" label="Write your message"/>
         <div>Your nickname: <span id="nick" class="nick me">no nick name</span></div>
         <header>List of participants</header>
         <ul id="participants"></ul>
+        <dl id="legend">
+          <dt>commands</dt>
+          <dd>Commands start with <em>/</em>
+            <dl>
+              <dt>/nick [new-nick]</dt>
+              <dd>changes your nickname to [new-nick]</dd>
+              <dt>/list</dt>
+              <dd>update list of users</dd>
+            </dl>
+          </dd>
+        </dl>
       </section>
       
       <section id="content">
         <h2>Messages</h2>
         <ul id="messages">
         </ul>
+        <header><label for="msg">Write your message</label></header>
+        <input id="msg" type="text" class="title" label="Write your message"/>
       </section>
       
       <section>
@@ -48,9 +59,10 @@
       <footer id="footer">
         <section>
           <ul>
-            <li><a href="http://clojure.org">Clojure</a></li>
-            <li><a href="https://github.com/clojure/clojurescript">ClojureScript</a></li>
-            <li><a href="http://dev.w3.org/html5/websockets/">WebSocket</a></li>
+            <li><a href="http://clojure.org" onClick="recordOutboundLink(this, 'Outbound Links');return false;">Clojure</a></li>
+            <li><a href="https://github.com/clojure/clojurescript" onClick="recordOutboundLink(this, 'Outbound Links');return false;">ClojureScript</a></li>
+            <li><a href="http://dev.w3.org/html5/websockets/" onClick="recordOutboundLink(this, 'Outbound Links');return false;">WebSocket</a></li>
+            <li><a href="http://github.com/neotyk/ws-cljs/" onClick="recordOutboundLink(this, 'Outbound Links');return false;">Source at GitHub</a></li>
             <li>
               <a href="http://ec2-46-137-58-250.eu-west-1.compute.amazonaws.com:8108/"
                  data-url="http://j.mp/oR4FlM"
@@ -108,6 +120,10 @@
       return unescape(param.split('=')[1]);
       }
       }
+      }
+      function recordOutboundLink(link, category) {
+      _gat._getTrackerByName()._trackEvent(category, link.href);
+      setTimeout('document.location = "' + link.href + '"', 100);
       }
   </body>
 </html>

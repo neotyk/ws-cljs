@@ -3,7 +3,9 @@
             [cljs.reader :as reader]
             [clojure.string :as string]
             [goog.dom :as dom]
-            [goog.dom.classes :as class]))
+            [goog.dom.classes :as class]
+            [goog.i18n.DateTimeFormat :as dtf]
+            [goog.date.DateTime :as dt]))
 
 (defn refresh-users
   "Redispalys users list."
@@ -20,11 +22,25 @@
            (dom/setTextContent user-el (name user))
            (dom/appendChild participants-el user-el))))))
 
+(defn new-message [msg]
+  (let [msgs-container (dom/getElement "messages")
+        new-msg (dom/createElement "li")
+        ts (dom/createDom "span")
+        now (goog.date.DateTime.)]
+    (class/set ts "tstamp")
+    (.setTime now (js* "new Date().getTime()"))
+    (dom/setTextContent ts (.format (goog.i18n.DateTimeFormat. "HH:mm:ss") now))
+    (dom/appendChild new-msg ts)
+    (dom/appendChild new-msg (dom/createTextNode msg))
+    (dom/appendChild msgs-container new-msg)
+    (set! msgs-container.scrollTop msgs-container.scrollHeight)))
+
 (defn new-nickname [body]
   (let [parts (string/split body #" ")]
     (if (= 2 (count parts))
       ;; nick change
       (let [[old new] parts]
+        (new-message (str old " -> " new))
         (if (= old (state/nick))
           ;; my nick change
           (state/chnick! new)
@@ -34,13 +50,6 @@
       ;; nick set
       (state/chnick! body)
       )))
-
-(defn new-message [msg]
-  (let [msgs-container (dom/getElement "messages")
-        new-msg (dom/createElement "li")]
-    (dom/setTextContent new-msg msg)
-    (dom/appendChild msgs-container new-msg)
-    (set! msgs-container.scrollTop msgs-container.scrollHeight)))
 
 (defn new-joiner [nick]
   (state/add-user! nick)
