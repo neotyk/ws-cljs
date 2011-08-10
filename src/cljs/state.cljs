@@ -1,5 +1,6 @@
 (ns state
   (:require [autocomplete :as ac]
+            [localstorage :as store]
             [logger :as log]
             [goog.dom :as dom]))
 
@@ -67,6 +68,13 @@
   (log/debug "state" (str "nick= " new-nick))
   (when-let [nick-el (dom/getElement "nick")]
     (set! nick-el.textContent new-nick))
+  (store/set! "nick" new-nick)
   (fn-users #(-> (disj % (nick))
                 (conj new-nick))
            new-nick))
+
+
+
+
+
+

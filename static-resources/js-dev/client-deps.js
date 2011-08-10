@@ -4,6 +4,7 @@ goog.addDependency("../clojure/string.js", ['clojure.string'], ['cljs.core', 'go
 goog.addDependency("../logger.js", ['logger'], ['cljs.core', 'goog.debug', 'goog.debug.DivConsole', 'goog.debug.Logger', 'goog.debug.LogManager', 'goog.debug.Logger.Level', 'goog.dom']);
 goog.addDependency("../websocket.js", ['websocket'], ['cljs.core', 'logger', 'goog.events', 'goog.net.WebSocket', 'goog.net.WebSocket.EventType', 'goog.net.WebSocket.MessageEvent']);
 goog.addDependency("../autocomplete.js", ['autocomplete'], ['cljs.core', 'goog.dom', 'goog.ui.AutoComplete', 'goog.ui.AutoComplete.Basic']);
-goog.addDependency("../state.js", ['state'], ['cljs.core', 'autocomplete', 'logger', 'goog.dom']);
+goog.addDependency("../localstorage.js", ['localstorage'], ['cljs.core', 'goog.storage.Storage', 'goog.storage.mechanism.HTML5LocalStorage']);
+goog.addDependency("../state.js", ['state'], ['cljs.core', 'autocomplete', 'localstorage', 'logger', 'goog.dom']);
 goog.addDependency("../commands.js", ['commands'], ['cljs.core', 'state', 'cljs.reader', 'clojure.string', 'goog.dom', 'goog.dom.classes']);
 goog.addDependency("../client.js", ['client'], ['cljs.core', 'websocket', 'goog.events', 'goog.events.EventHandler', 'goog.dom', 'state', 'logger', 'goog.events.EventType', 'goog.ui.LabelInput', 'goog.ui.AnimatedZippy', 'goog.ui.Tooltip', 'commands']);
