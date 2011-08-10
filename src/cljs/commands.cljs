@@ -35,7 +35,6 @@
       (state/chnick! body)
       )))
 
-;; Display
 (defn new-message [msg]
   (let [msgs-container (dom/getElement "messages")
         new-msg (dom/createElement "li")]
