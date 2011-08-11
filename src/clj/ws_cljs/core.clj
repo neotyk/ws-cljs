@@ -1,6 +1,5 @@
 (ns ws-cljs.core
-  (:use
-        [ring.middleware.file :only [wrap-file]]
+  (:use [ring.middleware.file :only [wrap-file]]
         [ring.middleware.file-info :only [wrap-file-info]]
         [ring.util.response :only [redirect]])
   (:require [compojure.route :as route]
@@ -63,7 +62,8 @@ TODO: Check if to user was not registered already."
   "Checks if nickname change is valid."
   [new-nick]
   (not (or (empty? new-nick)
-           (contains? @*USERS* new-nick))))
+           (contains? @*USERS* new-nick)
+           (.contains new-nick " "))))
 
 (defn onNick
   "On nick handler.
