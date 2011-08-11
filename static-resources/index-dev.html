@@ -123,11 +123,11 @@ function extractParamFromUri(uri, paramName) {
     if (param.indexOf(paramName) === 0) {
       return unescape(param.split('=')[1]);
     }
-  }
-}
+  };
 function recordOutboundLink(link, category) {
     _gat._getTrackerByName()._trackEvent(category, link.href);
     setTimeout('document.location = "' + link.href + '"', 100);
   }
+    </script>
   </body>
 </html>
